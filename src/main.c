@@ -1,53 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define SIZE 20
-#define RANGE 100
-
-void print_vector(int* v, int size, char c) {
+void
+print_vector(int *v, int size, char c)
+{
     for (int i = 0; i < size; i++) {
         printf("%c[%d]=%d\n", c, i, v[i]);
     }
 }
 
-void counting_sort(int* A, int* B, int size, int range) {
-    int* C = malloc(sizeof(int) * (range + 1));
-
-    for (int i = 0; i < range + 1; i++) {
-        C[i] = 0;
-    }
-
-    for (int j = 0; j < size; j++) {
-        C[ A[j] ]++;
-    }
-    // C[i] now contains the number of elements equal to i.
-
-    for (int i = 1; i < range + 1; i++) {
-        C[i] += C[i - 1];
-    }
-    // C[i] now contains the number of elements less than or equal to i.
-
-    for (int j = size - 1; j >= 0; j--) {
-        B[ C[ A[j] ] - 1 ] = A[j];
-        C[ A[j] ]--;
-    }
-
-    free(C);
+int
+random_mm (const int min, const int max)
+{
+    return min + rand() % (max - min + 1);
 }
 
-int main(int argc, char** argv) {
-    int A[SIZE];
-    int B[SIZE];
+void
+csort(int v[], const int min, const int max, const int l, const int r)
+{
+    const int csize = max - min + 1;
+    const int vsize = r - l + 1;
 
-    for (int i = 0; i < SIZE; i++) {
-        A[i] = rand() % RANGE;
+    int *count = calloc(csize, sizeof (int));
+    int *buf   = malloc(vsize * sizeof (int));
+
+    for (int i = l; i <= r; i++) {
+        count[v[i] - min]++;
     }
 
-    counting_sort(A, B, SIZE, RANGE);
-    puts("------------------");
+    for (int i = 1; i < csize; i++) {
+        count[i] += count[i - 1];
+    }
+
+    for (int i = r; i >= l; i--) {
+        buf[count[v[i] - min] - 1] = v[i];
+        --count[v[i] - min];
+    }
+
+    for (int i = r; i >= l; i--) {
+        v[i] = buf[i - l];
+    }
+
+    free(count);
+    free(buf);
+}
+
+#define SIZE  8
+#define MIN 0
+#define MAX 5
+
+int
+main(void)
+{
+    int A[SIZE];
+
+    srand(time(NULL));
+    for (int i = 0; i < SIZE; i++) {
+        A[i] = random_mm(MIN, MAX);
+    }
+
+    puts("=============");
+    puts("Counting Sort");
+    puts("=============");
+    csort(A, MIN, MAX, 0, SIZE-1);
     print_vector(A, SIZE, 'A');
-    puts("------------------");
-    print_vector(B, SIZE, 'B');
 
     return 0;
 }
