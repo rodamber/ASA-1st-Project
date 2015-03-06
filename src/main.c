@@ -3,7 +3,7 @@
 #include <time.h>
 
 void
-print_vector(int *v, int size, char c)
+print_array(int *v, int size, char c)
 {
     for (int i = 0; i < size; i++) {
         printf("%c[%d]=%d\n", c, i, v[i]);
@@ -64,7 +64,7 @@ main(void)
     puts("Counting Sort");
     puts("=============");
     csort(A, MIN, MAX, 0, SIZE-1);
-    print_vector(A, SIZE, 'A');
+    print_array(A, SIZE, 'A');
 
     return 0;
 }
