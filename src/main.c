@@ -2,36 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-void
-print_array_h(const int *a, size_t nmemb)
-{
-    for (size_t i = 0; i < nmemb - 1; i++) {
-        printf("+---");
-    }
-    printf("+---+\n");
-
-    for (size_t i = 0; i < nmemb; i++) {
-        printf("| %d ", a[i]);
-    }
-    printf("|\n");
-
-    for (size_t i = 0; i < nmemb - 1; i++) {
-        printf("+---");
-    }
-    printf("+---+\n");
-}
-
-void
-print_int(const void * p)
-{
-    printf("%d", *((int*) p));
-}
-
-int
-random_mm (const int min, const int max)
-{
-    return min + rand() % (max - min + 1);
-}
+#include "utils.h"
 
 void
 csort(int *a, const int min, const int max, const int l, const int r)
@@ -42,21 +13,23 @@ csort(int *a, const int min, const int max, const int l, const int r)
     int *count = calloc(csize, sizeof (int));
     int *buf   = malloc(asize * sizeof (int));
 
-    for (int i = l; i <= r; i++) {
+    int i;
+
+    for (i = l; i <= r; i++) {
         count[a[i] - min]++;
     }
 
-    for (int i = 1; i < csize; i++) {
+    for (i = 1; i < csize; i++) {
         count[i] += count[i - 1];
     }
 
-    for (int i = r; i >= l; i--) {
+    for (i = r; i >= l; i--) {
         buf[count[a[i] - min] - 1] = a[i];
         --count[a[i] - min];
     }
     free(count);
 
-    for (int i = r; i >= l; i--) {
+    for (i = r; i >= l; i--) {
         a[i] = buf[i - l];
     }
     free(buf);
@@ -70,16 +43,17 @@ int
 main(void)
 {
     int a[SIZE];
-
-    srand(time(NULL));
-    for (int i = 0; i < SIZE; i++) {
-        a[i] = random_mm(MIN, MAX);
-    }
+    int i;
 
     const int pad_size = 4 * (SIZE / 2 - 2);
     char *padding = calloc(pad_size, sizeof (char));
 
-    for (int i = 0; i < pad_size; i++) {
+    srand(time(NULL));
+    for (i = 0; i < SIZE; i++) {
+        a[i] = random_mm(MIN, MAX);
+    }
+
+    for (i = 0; i < pad_size; i++) {
         padding[i] = ' ';
     }
 
