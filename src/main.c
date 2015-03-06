@@ -10,7 +10,7 @@ print_array_h(const int *a, size_t nmemb)
     }
     printf("+---+\n");
 
-    for (size_t i = 0; i < nmemb; i ++) {
+    for (size_t i = 0; i < nmemb; i++) {
         printf("| %d ", a[i]);
     }
     printf("|\n");
@@ -19,16 +19,6 @@ print_array_h(const int *a, size_t nmemb)
         printf("+---");
     }
     printf("+---+\n");
-}
-
-void
-print_array_v(const int *a, size_t nmemb)
-{
-    printf("+---+\n");
-    for (size_t i = 0; i < nmemb; i++) {
-        printf("| %d |\n", a[i]);
-        printf("+---+\n");
-    }
 }
 
 void
@@ -72,7 +62,7 @@ csort(int *a, const int min, const int max, const int l, const int r)
     free(buf);
 }
 
-#define SIZE 21
+#define SIZE 20
 #define MIN  0
 #define MAX  5
 
@@ -86,20 +76,19 @@ main(void)
         a[i] = random_mm(MIN, MAX);
     }
 
-    char *padding = calloc(1 + SIZE / 2, sizeof (char));
+    const int pad_size = 4 * (SIZE / 2 - 2);
+    char *padding = calloc(pad_size, sizeof (char));
 
-    int i = 0;
-    while (padding[i++] = ' ')
-        ;
+    for (int i = 0; i < pad_size; i++) {
+        padding[i] = ' ';
+    }
 
-    printf("%s=============", padding);
-    printf("%sCounting Sort", padding);
-    printf("%s=============", padding);
-
+    printf("%s=============\n", padding);
+    printf("%sCounting Sort\n", padding);
+    printf("%s=============\n", padding);
     csort(a, MIN, MAX, 0, SIZE-1);
-
     print_array_h(a, SIZE);
-    //print_array_v(a, SIZE);
 
+    free(padding);
     return 0;
 }
