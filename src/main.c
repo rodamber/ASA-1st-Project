@@ -1,19 +1,64 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
-#include "utils.h"
+typedef struct node {
+    int vertex;
+    struct node *next;
+} node;
+
+node *
+insert_node(node *head, int v)
+{
+    node *j       = head;
+    node *vnode   = malloc(sizeof (node));
+    vnode->vertex = v;
+
+    if (head == NULL || v <= head->vertex) {
+        vnode->next = head;
+        return vnode;
+    }
+
+    while (j->next && v > j->next->vertex) {
+        j = j->next;
+    }
+
+    vnode->next = j->next;
+    j->next     = vnode;
+
+    return head;
+}
+
+void
+node_map(node *head, void (*f)(node *))
+{
+    while (head) {
+        f(head);
+        head = head->next;
+    }
+}
+
+void
+print_int(node *n)
+{
+    printf("%d -> ", n->vertex);
+}
+
+void
+print_list(node *head)
+{
+    node_map(head, &print_int);
+}
 
 void
 csort(int *a, const int min, const int max, const int l, const int r)
 {
+    int i;
+
     const int csize = max - min + 1;
     const int asize = r - l + 1;
 
     int *count = calloc(csize, sizeof (int));
     int *buf   = malloc(asize * sizeof (int));
-
-    int i;
 
     for (i = l; i <= r; i++) {
         count[a[i] - min]++;
@@ -35,34 +80,19 @@ csort(int *a, const int min, const int max, const int l, const int r)
     free(buf);
 }
 
-#define SIZE 20
-#define MIN  0
-#define MAX  5
-
 int
 main(void)
 {
-    int a[SIZE];
     int i;
 
-    const int pad_size = 4 * (SIZE / 2 - 2);
-    char *padding = calloc(pad_size, sizeof (char));
+    node **erdos_adj = calloc(1, sizeof (node *));
 
-    srand(time(NULL));
-    for (i = 0; i < SIZE; i++) {
-        a[i] = random_mm(MIN, MAX);
+    for (i = 0; i < 1; i++) {
+        erdos_adj[0] = insert_node(erdos_adj[0], i);
     }
+    print_list(erdos_adj[0]);
 
-    for (i = 0; i < pad_size; i++) {
-        padding[i] = ' ';
-    }
-
-    printf("%s=============\n", padding);
-    printf("%sCounting Sort\n", padding);
-    printf("%s=============\n", padding);
-    csort(a, MIN, MAX, 0, SIZE-1);
-    print_array_h(a, SIZE);
-
-    free(padding);
+    /* fazer free as listas todas (e a tudo o resto) */
+    free(erdos_adj);
     return 0;
 }
