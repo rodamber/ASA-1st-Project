@@ -40,73 +40,110 @@ print_list(node *head)
     node_fmap(head, &print_int);
 }
 
-void
-csort(int *a, const int min, const int max, const int l, const int r)
-{
-    int i;
-
-    const int csize = max - min + 1;
-    const int asize = r - l + 1;
-
-    int *count = calloc(csize, sizeof (int));
-    int *buf   = malloc(asize * sizeof (int));
-
-    for (i = l; i <= r; i++) {
-        count[a[i] - min]++;
-    }
-
-    for (i = 1; i < csize; i++) {
-        count[i] += count[i - 1];
-    }
-
-    for (i = r; i >= l; i--) {
-        buf[count[a[i] - min] - 1] = a[i];
-        --count[a[i] - min];
-    }
-    free(count);
-
-    for (i = r; i >= l; i--) {
-        a[i] = buf[i - l];
-    }
-    free(buf);
-}
-
 int
 main(void)
 {
-    int i;
+    int i, j;
 
-    int vertices;
-    int edges;
-    int erdos;
-
+    int nvertices, nedges, erdos;
+    int *graph[2]; /* se calhar este dois nao devia estar hardcoded */
     node **erdos_adj = NULL;
 
-    scanf("%d", &vertices);
+    int *count  = NULL;
+    int *buf[2];
+
+    scanf("%d", &nvertices);
     getchar();
-    scanf("%d", &edges);
+    scanf("%d", &nedges);
     getchar();
     scanf("%d", &erdos);
 
-    erdos_adj = calloc(vertices, sizeof (node *));
+    graph[0]  = malloc(nedges * sizeof (int));
+    graph[1]  = malloc(nedges * sizeof (int));
+    erdos_adj = calloc(nvertices, sizeof (node *));
 
-printf("vs = %d; es = %d; erdos = %d\n", vertices, edges, erdos);
+    count  = malloc(nvertices * sizeof (int));
+    buf[0] = malloc(nedges    * sizeof (int));
+    buf[1] = malloc(nedges    * sizeof (int));
 
-    for (i = 0; i < edges; i++) {
-        int u, v;
 
-        scanf("%d", &u);
+/* printf("vs = %d; es = %d; erdos = %d\n", nvertices, nedges, erdos); */
+printf("%d %d\n%d\n", nvertices, nedges, erdos);
+
+    for (i = 0; i < nedges; i++)
+    {
+        scanf("%d", &graph[0][i]);
         getchar();
-        scanf("%d", &v);
+        scanf("%d", &graph[1][i]);
 
-        erdos_adj[v - 1] = insert_node(erdos_adj[v - 1], u);
-        erdos_adj[u - 1] = insert_node(erdos_adj[u - 1], v);
+        /* printf("%d %d\n", graph[0][i], graph[1][i]); */
+        /* erdos_adj[v - 1] = insert_node(erdos_adj[v - 1], u); */
+        /* erdos_adj[u - 1] = insert_node(erdos_adj[u - 1], v); */
     }
 
-for (i = 0; i < vertices; i++) {
+#define nextj (j + 1) % 2
+
+    /* RadixLSD on graph. */
+    for (j = 1; j >= 0; j--) {
+        /* Counting sort on graph[j]. */
+
+        for (i = 0; i < nvertices; i++)
+        {
+            count[i] = 0;
+        }
+
+        for (i = 0; i < nedges; i++)
+        {
+            count[ graph[j][i] - 1]++;
+        }
+
+        for (i = 1; i < nvertices; i++)
+        {
+            count[i] += count[i - 1];
+        }
+
+        for (i = nedges - 1; i >= 0; i--)
+        {
+            int u = graph[j]    [i];
+            int v = graph[nextj][i];
+
+            buf[j]    [ count[u - 1] - 1 ] = u;
+            buf[nextj][ count[u - 1] - 1 ] = v;
+            --count[u - 1];
+        }
+
+        for (i = nedges - 1; i >= 0; i--)
+        {
+            graph[j]    [i] = buf[j]    [i];
+            graph[nextj][i] = buf[nextj][i];
+        }
+    }
+    free(count);
+    free(buf[0]);
+    free(buf[1]);
+
+    /* Create Erdos colaboration graph. */
+    for (j = 0; j < 2; j++)
+    {
+        for (i = nedges - 1; i >= 0; i--)
+        {
+            int u = graph[j]    [i];
+            int v = graph[nextj][i];
+
+            erdos_adj[u - 1] = insert_node( erdos_adj[u - 1], v);
+        }
+    }
+
+for (i = 0; i < nedges; i++) {
+    printf("%d %d\n", graph[0][i], graph[1][i]);
+}
+
+puts("");
+for (i = 0; i < nvertices; i++) {
     printf("%d: ", i + 1);
     print_list(erdos_adj[i]);
 }
+
 
     /* fazer free as listas todas (e a tudo o resto) */
     free(erdos_adj);
