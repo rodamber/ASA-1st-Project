@@ -74,7 +74,7 @@ csort(int *a, const int min, const int max, const int l, const int r)
 int
 main(void)
 {
-    int i, c;
+    int i;
 
     int vertices;
     int edges;
@@ -92,12 +92,12 @@ main(void)
 
 printf("vs = %d; es = %d; erdos = %d\n", vertices, edges, erdos);
 
-    while ((c = getchar()) != EOF) {
+    for (i = 0; i < edges; i++) {
         int u, v;
 
-        if (scanf("%d", &u) == EOF) break;
+        scanf("%d", &u);
         getchar();
-        if (scanf("%d", &v) == EOF) break;
+        scanf("%d", &v);
 
         erdos_adj[v - 1] = insert_node(erdos_adj[v - 1], u);
         erdos_adj[u - 1] = insert_node(erdos_adj[u - 1], v);
