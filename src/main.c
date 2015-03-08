@@ -1,22 +1,71 @@
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#define WHITE 0
+#define GRAY  1
+#define BLACK 2
+
 typedef struct node {
-    int key;
+    unsigned key;
+    unsigned color;
+    unsigned dist;
+    struct node *pred;
     struct node *next;
 } node;
 
+typedef struct queue {
+    node *head;
+    node *tail;
+} queue;
+
 node *
-insert_node(node *head, int v)
+insert_node(node *head, unsigned v)
 {
-    node *vnode   = malloc(sizeof (node));
-    vnode->key = v;
-    vnode->next   = head;
+    node *vnode = malloc(sizeof (node));
+    vnode->key  = v;
+    vnode->next = head;
     return vnode;
 }
 
+node *
+dequeue(queue *q)
+{
+
+}
+
 void
-node_fmap(node *head, void (*f)(node *))
+enqueue(queue *q, node *n)
+{
+
+}
+
+void
+bfs(node **adjs, size_t nnodes, node *src)
+{
+    size_t n;
+    node **q = NULL;
+
+    for (n = 0; n < nnodes; nnodes++)
+    {
+        if (adjs[n] != src)
+        {
+            adjs[n]->color = WHITE;
+            adjs[n]->dist  = UINT_MAX;
+            adjs[n]->pred  = NULL;
+        }
+    }
+
+    src->color = GRAY;
+    src->dist  = 0;
+    src->pred  = NULL;
+
+    /* ... */
+
+}
+
+void
+llist_fmap(node *head, void (*f)(node *))
 {
     while (head)
     {
@@ -39,9 +88,9 @@ print_node_key(node *n)
 }
 
 void
-print_list(node *head)
+print_llist(node *head)
 {
-    node_fmap(head, &print_node_key);
+    llist_fmap(head, &print_node_key);
 }
 
 void
@@ -60,28 +109,27 @@ main(void)
 {
     int i, j;
 
-    int nvertices, nedges, erdos;
-    int *graph[2]; /* se calhar este dois nao devia estar hardcoded */
-    node **erdos_adj = NULL;
+    int nnodes, nedges, erdos;
+    int *graph[2];
+/* se calhar este dois nao devia estar hardcoded */
+    node **erdos_adjs = NULL;
 
-    int *count  = NULL;
+    int *count = NULL;
     int *buf[2];
 
-    scanf("%d", &nvertices);
+    scanf("%d", &nnodes);
     getchar();
     scanf("%d", &nedges);
     getchar();
     scanf("%d", &erdos);
 
-    graph[0]  = malloc(2 * nedges * sizeof (int));
-    graph[1]  = malloc(2 * nedges * sizeof (int));
-    erdos_adj = malloc(nvertices  * sizeof (node *));
+    graph[0]   = malloc(2 * nedges * sizeof (int));
+    graph[1]   = malloc(2 * nedges * sizeof (int));
+    erdos_adjs = calloc(nnodes, sizeof (node *));
 
-    count  = malloc(nvertices  * sizeof (int));
+    count  = malloc(nnodes  * sizeof (int));
     buf[0] = malloc(2 * nedges * sizeof (int));
     buf[1] = malloc(2 * nedges * sizeof (int));
-
-/*printf("%d %d\n%d\n", nvertices, nedges, erdos);*/
 
     for (i = 0, j = 1; i < 2 * nedges - 1; i += 2, j += 2)
     {
@@ -96,9 +144,6 @@ main(void)
 
         graph[0][j] = v;
         graph[1][j] = u;
-
-/*printf("%d %d\n", graph[0][i], graph[1][i]);*/
-/*printf("%d %d\n", graph[0][j], graph[1][j]);*/
     }
 
 #define nextj (j + 1) % 2
@@ -107,7 +152,7 @@ main(void)
     for (j = 1; j >= 0; j--) {
         /* Counting sort on graph[j]. */
 
-        for (i = 0; i < nvertices; i++)
+        for (i = 0; i < nnodes; i++)
         {
             count[i] = 0;
         }
@@ -117,7 +162,7 @@ main(void)
             count[ graph[j][i] - 1]++;
         }
 
-        for (i = 1; i < nvertices; i++)
+        for (i = 1; i < nnodes; i++)
         {
             count[i] += count[i - 1];
         }
@@ -151,7 +196,7 @@ main(void)
         int u = graph[0][i];
         int v = graph[1][i];
 
-        erdos_adj[u - 1] = insert_node( erdos_adj[u - 1], v);
+        erdos_adjs[u - 1] = insert_node(erdos_adjs[u - 1], v);
     }
     free(graph[0]);
     free(graph[1]);
@@ -162,20 +207,19 @@ for (i = 0; i < 2 * nedges; i++) {
 }
 puts("");
 */
-
-for (i = 0; i < nvertices; i++) {
+for (i = 0; i < nnodes; i++) {
     printf("%d: ", i + 1);
-    print_list(erdos_adj[i]);
+    print_llist(erdos_adjs[i]);
 }
 
 
     /* fazer free as listas todas (e a tudo o resto) */
 
-    for (i = 0; i < nvertices; i++)
+    for (i = 0; i < nnodes; i++)
     {
-        free_list(erdos_adj[i]);
+        free_list(erdos_adjs[i]);
     }
-    free(erdos_adj);
+    free(erdos_adjs);
 
     return 0;
 }
