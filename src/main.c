@@ -9,27 +9,14 @@ typedef struct node {
 node *
 insert_node(node *head, int v)
 {
-    node *j       = head;
     node *vnode   = malloc(sizeof (node));
     vnode->vertex = v;
-
-    if (head == NULL || v <= head->vertex) {
-        vnode->next = head;
-        return vnode;
-    }
-
-    while (j->next && v > j->next->vertex) {
-        j = j->next;
-    }
-
-    vnode->next = j->next;
-    j->next     = vnode;
-
-    return head;
+    vnode->next   = head;
+    return vnode;
 }
 
 void
-node_map(node *head, void (*f)(node *))
+node_fmap(node *head, void (*f)(node *))
 {
     while (head) {
         f(head);
@@ -40,13 +27,17 @@ node_map(node *head, void (*f)(node *))
 void
 print_int(node *n)
 {
-    printf("%d -> ", n->vertex);
+    if (n->next) {
+        printf("%d -> ", n->vertex);
+    } else {
+        printf("%d\n", n->vertex);
+    }
 }
 
 void
 print_list(node *head)
 {
-    node_map(head, &print_int);
+    node_fmap(head, &print_int);
 }
 
 void
@@ -83,14 +74,39 @@ csort(int *a, const int min, const int max, const int l, const int r)
 int
 main(void)
 {
-    int i;
+    int i, c;
 
-    node **erdos_adj = calloc(1, sizeof (node *));
+    int vertices;
+    int edges;
+    int erdos;
 
-    for (i = 0; i < 1; i++) {
-        erdos_adj[0] = insert_node(erdos_adj[0], i);
+    node **erdos_adj = NULL;
+
+    scanf("%d", &vertices);
+    getchar();
+    scanf("%d", &edges);
+    getchar();
+    scanf("%d", &erdos);
+
+    erdos_adj = calloc(vertices, sizeof (node *));
+
+printf("vs = %d; es = %d; erdos = %d\n", vertices, edges, erdos);
+
+    while ((c = getchar()) != EOF) {
+        int u, v;
+
+        if (scanf("%d", &u) == EOF) break;
+        getchar();
+        if (scanf("%d", &v) == EOF) break;
+
+        erdos_adj[v - 1] = insert_node(erdos_adj[v - 1], u);
+        erdos_adj[u - 1] = insert_node(erdos_adj[u - 1], v);
     }
-    print_list(erdos_adj[0]);
+
+for (i = 0; i < vertices; i++) {
+    printf("%d: ", i + 1);
+    print_list(erdos_adj[i]);
+}
 
     /* fazer free as listas todas (e a tudo o resto) */
     free(erdos_adj);
