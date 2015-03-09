@@ -2,6 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* ========================================================================== */
+/* Structs                                                                    */
+/* ========================================================================== */
+
+/*
+ * Single linked list construction for adjancency-list graph representation.
+ *
+ * A sllist has the properties color, distance (dist) and predecessor (pred),
+ * used in the breadth-first search algorithm. It also has a key and link for
+ * the head node.
+ */
+
 typedef struct node {
     unsigned     key;
     struct node *next;
@@ -13,19 +25,24 @@ typedef struct {
     unsigned key;
     unsigned pred;
     node    *head;
-} llist;
+} sllist;
 
-llist *
-new_llist(unsigned key)
+
+/*
+ * Single linked list methods.
+ */
+
+sllist *
+new_sllist(unsigned key)
 {
-    llist *ll = malloc(sizeof (llist));
+    sllist *ll = malloc(sizeof (sllist));
     ll->key  = key;
     ll->head = NULL;
     return ll;
 }
 
 void
-llist_insert(llist *ll, unsigned key)
+sllist_insert(sllist *ll, unsigned key)
 {
     node *vnode = malloc(sizeof (node));
     vnode->key  = key;
@@ -34,37 +51,7 @@ llist_insert(llist *ll, unsigned key)
 }
 
 void
-llist_fmap(llist *ll, void (*f)(node *))
-{
-    node *head = ll->head;
-    while (head)
-    {
-        f(head);
-        head = head->next;
-    }
-}
-
-void
-print_node(node *n)
-{
-    if (n->next)
-    {
-        printf("%u -> ", n->key);
-    }
-    else
-    {
-        printf("%u\n", n->key);
-    }
-}
-
-void
-llist_print(llist *ll)
-{
-    llist_fmap(ll, &print_node);
-}
-
-void
-llist_free(llist *ll)
+sllist_free(sllist *ll)
 {
     node *n = ll->head;
     while (n)
@@ -76,8 +63,13 @@ llist_free(llist *ll)
     free(ll);
 }
 
+
+/*
+ * Queue construction.
+ */
+
 typedef struct qnode{
-    llist        *ll;
+    sllist        *ll;
     struct qnode *next;
 } qnode;
 
@@ -85,6 +77,11 @@ typedef struct {
     qnode *head;
     qnode *tail;
 } queue;
+
+
+/*
+ * Queue methods.
+ */
 
 queue *
 new_queue()
@@ -94,10 +91,10 @@ new_queue()
     return q;
 }
 
-llist *
+sllist *
 dequeue(queue *q)
 {
-    llist *ll  = q->head->ll;
+    sllist *ll  = q->head->ll;
     qnode *tmp = q->head;
     q->head    = q->head->next;
     free(tmp);
@@ -110,7 +107,7 @@ dequeue(queue *q)
 }
 
 void
-enqueue(queue *q, llist *ll)
+enqueue(queue *q, sllist *ll)
 {
     qnode *qn = malloc(sizeof (qnode));
     qn->ll    = ll;
@@ -141,18 +138,10 @@ free_queue(queue *q)
     }
 }
 
-void
-print_queue(queue *q)
-{
-    qnode *head = q->head;
-    printf("[");
-    while (head)
-    {
-        printf("%d,", head->ll->key);
-        head = head->next;
-    }
-    printf("]\n");
-}
+
+/* ========================================================================== */
+/* Functions                                                                  */
+/* ========================================================================== */
 
 #define emptyq(Q) !(Q->head)
 
@@ -162,10 +151,10 @@ print_queue(queue *q)
 #define NIL   0
 
 void
-bfs(llist **adjls, size_t nvertices, int src_key)
+bfs(sllist **adjls, size_t nvertices, int src_key)
 {
     size_t n;
-    llist *src = adjls[src_key - 1];
+    sllist *src = adjls[src_key - 1];
     queue *q   = NULL;
 
     for (n = 0; n < nvertices; n++)
@@ -183,7 +172,7 @@ bfs(llist **adjls, size_t nvertices, int src_key)
 
     while (!emptyq(q))
     {
-        llist *u;
+        sllist *u;
         node  *v;
 
 #define adjl(A) adjls[A->key - 1]
@@ -208,39 +197,48 @@ int
 main(void)
 {
     int i, j, max_erdos_n;
+    char c;
 
     int nvertices, nedges, erdos;
+
+     /*
+      * The edges will be stored here and then inserted in the adj-list. This
+      * way we will be able to sort the edges easily.
+      */
     int *graph[2];
-/* se calhar este dois nao devia estar hardcoded */
 
-    llist **erdos_adjls  = NULL;
-    int    *erdos_ncount = NULL;
+    sllist **erdos_adjls; /* Adjacency-lists. */
+    int *erdos_ncount;
 
-    int *count = NULL;
+    int *count;
     int *buf[2];
 
-    scanf("%d", &nvertices);
-    getchar();
-    scanf("%d", &nedges);
-    getchar();
-    scanf("%d", &erdos);
+    /*
+     * Read input.
+     */
+    if ( scanf("%d%c%d%c%d", &nvertices, &c, &nedges, &c, &erdos) != 5 )
+    {
+        return -1;
+    }
 
     graph[0] = malloc(2 * nedges * sizeof (int));
     graph[1] = malloc(2 * nedges * sizeof (int));
 
-    for (i = 0, j = 1; i < 2 * nedges - 1; i += 2, j += 2)
+    for (i = 0; i < 2 * nedges - 1; i += 2)
     {
         int u, v;
 
-        scanf("%d", &u);
-        getchar();
-        scanf("%d", &v);
+        if ( scanf("%d%c%d", &u, &c, &v) != 3 )
+        {
+            return -1;
+        }
 
         graph[0][i] = u;
         graph[1][i] = v;
 
-        graph[0][j] = v;
-        graph[1][j] = u;
+        /* The graph will be undirected so we also insert the edge "reverted".*/
+        graph[0][i + 1] = v;
+        graph[1][i + 1] = u;
     }
 
     count  = malloc(nvertices  * sizeof (int));
@@ -249,7 +247,9 @@ main(void)
 
 #define nextj (j + 1) % 2
 
-    /* RadixLSD on graph. */
+    /*
+     * RadixLSD on graph.
+     */
     for (j = 1; j >= 0; j--) {
         /* Counting sort on graph[j]. */
         for (i = 0; i < nvertices; i++)
@@ -279,31 +279,42 @@ main(void)
             graph[nextj][i] = buf[nextj][i];
         }
     }
+
     free(count);
     free(buf[0]);
     free(buf[1]);
 
     /*
      * Create Erdos colaboration graph.
-     * Every list will become sorted by the keys of its nodes.
+     * Every adj-list is sorted by the keys of its nodes.
      */
-    erdos_adjls = malloc(nvertices * sizeof (llist *));
+    erdos_adjls = malloc(nvertices * sizeof (sllist *));
+
+    /* Initialization. */
     for (i = 0; i < nvertices; i++)
     {
-        erdos_adjls[i] = new_llist(i + 1);
+        erdos_adjls[i] = new_sllist(i + 1);
     }
+
+    /* Insertion. */
     for (i = 2 * nedges - 1, j = nedges; i >= 0; i--)
     {
         int u = graph[0][i];
         int v = graph[1][i];
 
-        llist_insert(erdos_adjls[u - 1], v);
+        sllist_insert(erdos_adjls[u - 1], v);
     }
+
     free(graph[0]);
     free(graph[1]);
 
+    /*
+     * We do a breadth-first search to determine the Erdos number of each
+     * scientist (distance to the source -- Paul Erdos).
+     */
     bfs(erdos_adjls, nvertices, erdos);
 
+    /* Determine the maximum Erdos number. */
     for (i = 0, max_erdos_n = 0; i < nvertices; i++)
     {
         if (erdos_adjls[i]->dist > max_erdos_n)
@@ -311,8 +322,13 @@ main(void)
             max_erdos_n = erdos_adjls[i]->dist;
         }
     }
+
     printf("%d\n", max_erdos_n);
 
+    /*
+     * The ith entry of erdos_ncount will be equal to number of scientists with
+     * Erdos number equal to i.
+     */
     erdos_ncount = calloc(max_erdos_n + 1, sizeof (int));
     for (i = 0; i < nvertices; i++)
     {
@@ -323,26 +339,12 @@ main(void)
     {
         printf("%d\n", erdos_ncount[i]);
     }
+
     free(erdos_ncount);
-
-/*
-for (i = 0; i < nvertices; i++) {
-    printf("%d: ", i + 1);
-    llist_print(erdos_adjls[i]);
-}
-
-
-for (i = 0; i < nvertices; i++) {
-    printf("%d: dist = %u, pred = %u\n",
-            i + 1,
-            erdos_adjls[i]->dist,
-            erdos_adjls[i]->pred);
-}
-*/
 
     for (i = 0; i < nvertices; i++)
     {
-        llist_free(erdos_adjls[i]);
+        sllist_free(erdos_adjls[i]);
     }
     free(erdos_adjls);
 
