@@ -14,54 +14,13 @@ typedef struct node {
     struct node *next;
 } node;
 
-typedef struct queue {
-    node *head;
-    node *tail;
-} queue;
-
 node *
-insert_node(node *head, unsigned v)
+llist_insert(node *head, unsigned v)
 {
     node *vnode = malloc(sizeof (node));
     vnode->key  = v;
     vnode->next = head;
     return vnode;
-}
-
-node *
-dequeue(queue *q)
-{
-
-}
-
-void
-enqueue(queue *q, node *n)
-{
-
-}
-
-void
-bfs(node **adjs, size_t nnodes, node *src)
-{
-    size_t n;
-    node **q = NULL;
-
-    for (n = 0; n < nnodes; nnodes++)
-    {
-        if (adjs[n] != src)
-        {
-            adjs[n]->color = WHITE;
-            adjs[n]->dist  = UINT_MAX;
-            adjs[n]->pred  = NULL;
-        }
-    }
-
-    src->color = GRAY;
-    src->dist  = 0;
-    src->pred  = NULL;
-
-    /* ... */
-
 }
 
 void
@@ -88,20 +47,94 @@ print_node_key(node *n)
 }
 
 void
-print_llist(node *head)
+llist_print(node *head)
 {
     llist_fmap(head, &print_node_key);
 }
 
 void
-free_list(node *head)
+llist_free(node *head)
 {
     if (head)
     {
         node *next = head->next;
         free(head);
-        free_list(next);
+        llist_free(next);
     }
+}
+
+typedef struct qnode {
+    node *node;
+    struct qnode *next;
+} qnode;
+
+typedef struct {
+    qnode *head;
+} queue;
+
+queue *
+new_queue()
+{
+    queue *q = malloc(sizeof (queue));
+    q->head  = NULL;
+    return q;
+}
+
+node *
+dequeue(queue *q)
+{
+    node *headn = q->head->node;
+    qnode *tmp  = q->head;
+    q->head     = q->head->next;
+    free(tmp);
+    return headn;
+}
+
+void
+enqueue(queue *q, node *n)
+{
+    qnode *qn = malloc(sizeof (qnode));
+    qn->node  = n;
+    qn->next  = q->head;
+    q->head   = qn;
+}
+
+int
+free_queue(queue *q)
+{
+    if (q->head)
+    {
+        return EXIT_FAILURE;
+    }
+    else
+    {
+        free(q);
+        return EXIT_SUCCESS;
+    }
+}
+
+void
+bfs(node **adjs, size_t nnodes, node *src)
+{
+    size_t n;
+    node **q = NULL;
+
+    for (n = 0; n < nnodes; nnodes++)
+    {
+        if (adjs[n] != src)
+        {
+            adjs[n]->color = WHITE;
+            adjs[n]->dist  = UINT_MAX;
+            adjs[n]->pred  = NULL;
+        }
+    }
+
+    src->color = GRAY;
+    src->dist  = 0;
+    src->pred  = NULL;
+
+    /* ... */
+
 }
 
 int
@@ -196,7 +229,7 @@ main(void)
         int u = graph[0][i];
         int v = graph[1][i];
 
-        erdos_adjs[u - 1] = insert_node(erdos_adjs[u - 1], v);
+        erdos_adjs[u - 1] = llist_insert(erdos_adjs[u - 1], v);
     }
     free(graph[0]);
     free(graph[1]);
@@ -209,7 +242,7 @@ puts("");
 */
 for (i = 0; i < nnodes; i++) {
     printf("%d: ", i + 1);
-    print_llist(erdos_adjs[i]);
+    llist_print(erdos_adjs[i]);
 }
 
 
@@ -217,7 +250,7 @@ for (i = 0; i < nnodes; i++) {
 
     for (i = 0; i < nnodes; i++)
     {
-        free_list(erdos_adjs[i]);
+        llist_free(erdos_adjs[i]);
     }
     free(erdos_adjs);
 
