@@ -143,7 +143,7 @@ free_queue(queue *q)
 /* Functions                                                                  */
 /* ========================================================================== */
 
-#define emptyq(Q) !(Q->head)
+#define EMPTYQ(Q) !(Q->head)
 
 #define WHITE 0
 #define GRAY  1
@@ -170,25 +170,25 @@ bfs(sllist **adjls, size_t nvertices, int src_key)
     q = new_queue();
     enqueue(q, src);
 
-    while (!emptyq(q))
+    while (!EMPTYQ(q))
     {
         sllist *u;
         node  *v;
 
-#define adjl(A) adjls[A->key - 1]
+#define ADJL(A) adjls[A->key - 1]
 
         u = dequeue(q);
         for (v = u->head; v != NULL; v = v->next)
         {
-            if (adjl(v)->color == WHITE)
+            if (ADJL(v)->color == WHITE)
             {
-                adjl(v)->color = GRAY;
-                adjl(v)->dist  = adjl(u)->dist + 1;
-                adjl(v)->pred  = u->key;
-                enqueue(q, adjl(v));
+                ADJL(v)->color = GRAY;
+                ADJL(v)->dist  = ADJL(u)->dist + 1;
+                ADJL(v)->pred  = u->key;
+                enqueue(q, ADJL(v));
             }
         }
-        adjl(u)->color = BLACK;
+        ADJL(u)->color = BLACK;
     }
     free_queue(q);
 }
@@ -197,7 +197,6 @@ int
 main(void)
 {
     int i, j, max_erdos_n;
-    char c;
 
     int nvertices, nedges, erdos;
 
@@ -216,7 +215,7 @@ main(void)
     /*
      * Read input.
      */
-    if ( scanf("%d%c%d%c%d", &nvertices, &c, &nedges, &c, &erdos) != 5 )
+    if ( scanf("%d %d\n%d", &nvertices, &nedges, &erdos) != 3 )
     {
         return -1;
     }
@@ -228,7 +227,7 @@ main(void)
     {
         int u, v;
 
-        if ( scanf("%d%c%d", &u, &c, &v) != 3 )
+        if ( scanf("%d %d", &u, &v) != 2 )
         {
             return -1;
         }
@@ -245,7 +244,7 @@ main(void)
     buf[0] = malloc(2 * nedges * sizeof (int));
     buf[1] = malloc(2 * nedges * sizeof (int));
 
-#define nextj (j + 1) % 2
+#define NEXTJ (j + 1) % 2
 
     /*
      * RadixLSD on graph.
@@ -267,16 +266,16 @@ main(void)
         for (i = 2 * nedges - 1; i >= 0; i--)
         {
             int u = graph[j]    [i];
-            int v = graph[nextj][i];
+            int v = graph[NEXTJ][i];
 
             buf[j]    [ count[u - 1] - 1 ] = u;
-            buf[nextj][ count[u - 1] - 1 ] = v;
+            buf[NEXTJ][ count[u - 1] - 1 ] = v;
                       --count[u - 1];
         }
         for (i = 2 * nedges - 1; i >= 0; i--)
         {
             graph[j]    [i] = buf[j]    [i];
-            graph[nextj][i] = buf[nextj][i];
+            graph[NEXTJ][i] = buf[NEXTJ][i];
         }
     }
 
@@ -297,7 +296,7 @@ main(void)
     }
 
     /* Insertion. */
-    for (i = 2 * nedges - 1, j = nedges; i >= 0; i--)
+    for (i = 2 * nedges - 1; i >= 0; i--)
     {
         int u = graph[0][i];
         int v = graph[1][i];
