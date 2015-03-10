@@ -143,7 +143,8 @@ free_queue(queue *q)
 /* Functions                                                                  */
 /* ========================================================================== */
 
-#define emptyq(Q) !(Q->head)
+#define ADJL(A) adjls[A->key - 1]
+#define EMPTYQ(Q) !(Q->head)
 
 #define WHITE 0
 #define GRAY  1
@@ -170,25 +171,23 @@ bfs(sllist **adjls, size_t nvertices, int src_key)
     q = new_queue();
     enqueue(q, src);
 
-    while (!emptyq(q))
+    while (!EMPTYQ(q))
     {
         sllist *u;
         node  *v;
 
-#define adjl(A) adjls[A->key - 1]
-
         u = dequeue(q);
         for (v = u->head; v != NULL; v = v->next)
         {
-            if (adjl(v)->color == WHITE)
+            if (ADJL(v)->color == WHITE)
             {
-                adjl(v)->color = GRAY;
-                adjl(v)->dist  = adjl(u)->dist + 1;
-                adjl(v)->pred  = u->key;
-                enqueue(q, adjl(v));
+                ADJL(v)->color = GRAY;
+                ADJL(v)->dist  = ADJL(u)->dist + 1;
+                ADJL(v)->pred  = u->key;
+                enqueue(q, ADJL(v));
             }
         }
-        adjl(u)->color = BLACK;
+        ADJL(u)->color = BLACK;
     }
     free_queue(q);
 }
@@ -211,7 +210,6 @@ main(void)
 
     /*
      * Create Erdos colaboration graph.
-     * Every adj-list is sorted by the keys of its nodes.
      */
     erdos_adjls = malloc(nvertices * sizeof (sllist *));
 
@@ -255,8 +253,6 @@ main(void)
         }
     }
 
-    printf("%d\n", max_erdos_n);
-
     /*
      * The ith entry of erdos_ncount will be equal to the number of scientists
      * with Erdos number equal to i.
@@ -267,13 +263,15 @@ main(void)
         erdos_ncount[ erdos_adjls[i]->dist ]++;
     }
 
+    /* Print output. */
+    printf("%d\n", max_erdos_n);
     for (i = 1; i < max_erdos_n + 1; i++)
     {
         printf("%d\n", erdos_ncount[i]);
     }
 
+    /* Free what's left to be freed. */
     free(erdos_ncount);
-
     for (i = 0; i < nvertices; i++)
     {
         sllist_free(erdos_adjls[i]);
