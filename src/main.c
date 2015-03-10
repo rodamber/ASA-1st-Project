@@ -196,93 +196,18 @@ bfs(sllist **adjls, size_t nvertices, int src_key)
 int
 main(void)
 {
-    int i, j, max_erdos_n;
-    char c;
+    int i, max_erdos_n;
 
     int nvertices, nedges, erdos;
-
-     /*
-      * The edges will be stored here and then inserted in the adj-list. This
-      * way we will be able to sort the edges easily.
-      */
-    int *graph[2];
 
     sllist **erdos_adjls; /* Adjacency-lists. */
     int *erdos_ncount;
 
-    int *count;
-    int *buf[2];
 
-    /*
-     * Read input.
-     */
-    if ( scanf("%d%c%d%c%d", &nvertices, &c, &nedges, &c, &erdos) != 5 )
+    if ( scanf("%d %d\n%d", &nvertices, &nedges, &erdos) != 3 )
     {
         return -1;
     }
-
-    graph[0] = malloc(2 * nedges * sizeof (int));
-    graph[1] = malloc(2 * nedges * sizeof (int));
-
-    for (i = 0; i < 2 * nedges - 1; i += 2)
-    {
-        int u, v;
-
-        if ( scanf("%d%c%d", &u, &c, &v) != 3 )
-        {
-            return -1;
-        }
-
-        graph[0][i] = u;
-        graph[1][i] = v;
-
-        /* The graph will be undirected so we also insert the edge "reverted".*/
-        graph[0][i + 1] = v;
-        graph[1][i + 1] = u;
-    }
-
-    count  = malloc(nvertices  * sizeof (int));
-    buf[0] = malloc(2 * nedges * sizeof (int));
-    buf[1] = malloc(2 * nedges * sizeof (int));
-
-#define nextj (j + 1) % 2
-
-    /*
-     * RadixLSD on graph.
-     */
-    for (j = 1; j >= 0; j--) {
-        /* Counting sort on graph[j]. */
-        for (i = 0; i < nvertices; i++)
-        {
-            count[i] = 0;
-        }
-        for (i = 0; i < 2 * nedges; i++)
-        {
-            count[ graph[j][i] - 1]++;
-        }
-        for (i = 1; i < nvertices; i++)
-        {
-            count[i] += count[i - 1];
-        }
-        for (i = 2 * nedges - 1; i >= 0; i--)
-        {
-            int u = graph[j]    [i];
-            int v = graph[nextj][i];
-
-            buf[j]    [ count[u - 1] - 1 ] = u;
-            buf[nextj][ count[u - 1] - 1 ] = v;
-                      --count[u - 1];
-        }
-        for (i = 2 * nedges - 1; i >= 0; i--)
-        {
-            graph[j]    [i] = buf[j]    [i];
-            graph[nextj][i] = buf[nextj][i];
-        }
-    }
-
-    free(count);
-    free(buf[0]);
-    free(buf[1]);
 
     /*
      * Create Erdos colaboration graph.
@@ -297,16 +222,23 @@ main(void)
     }
 
     /* Insertion. */
-    for (i = 2 * nedges - 1, j = nedges; i >= 0; i--)
+    for (i = 0; i < nedges; i++)
     {
-        int u = graph[0][i];
-        int v = graph[1][i];
+        int u, v;
+
+        if ( scanf("%d %d", &u, &v) != 2 )
+        {
+            return -1;
+        }
 
         sllist_insert(erdos_adjls[u - 1], v);
-    }
 
-    free(graph[0]);
-    free(graph[1]);
+        /*
+         * Because the graph will be undirected, we also insert the edge
+         * "reversed".
+         */
+        sllist_insert(erdos_adjls[v - 1], u);
+    }
 
     /*
      * We do a breadth-first search to determine the Erdos number of each
@@ -326,8 +258,8 @@ main(void)
     printf("%d\n", max_erdos_n);
 
     /*
-     * The ith entry of erdos_ncount will be equal to number of scientists with
-     * Erdos number equal to i.
+     * The ith entry of erdos_ncount will be equal to the number of scientists
+     * with Erdos number equal to i.
      */
     erdos_ncount = calloc(max_erdos_n + 1, sizeof (int));
     for (i = 0; i < nvertices; i++)
