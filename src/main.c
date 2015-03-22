@@ -13,7 +13,6 @@
  * used in the breadth-first search algorithm. It also has a key and link for
  * the head node.
  */
-
 typedef struct node {
     unsigned     key;
     struct node *next;
@@ -31,7 +30,6 @@ typedef struct {
 /*
  * Single linked list methods.
  */
-
 sllist *
 new_sllist(unsigned key)
 {
@@ -67,7 +65,6 @@ sllist_free(sllist *ll)
 /*
  * Queue construction.
  */
-
 typedef struct qnode{
     sllist        *ll;
     struct qnode *next;
@@ -82,7 +79,6 @@ typedef struct {
 /*
  * Queue methods.
  */
-
 queue *
 new_queue()
 {
@@ -95,8 +91,8 @@ sllist *
 dequeue(queue *q)
 {
     sllist *ll  = q->head->ll;
-    qnode *tmp = q->head;
-    q->head    = q->head->next;
+    qnode *tmp  = q->head;
+    q->head     = q->head->next;
     free(tmp);
 
     if (q->head == NULL)
@@ -156,7 +152,7 @@ bfs(sllist **adjls, size_t nvertices, int src_key)
 {
     size_t n;
     sllist *src = adjls[src_key - 1];
-    queue *q   = NULL;
+    queue  *q   = NULL;
 
     for (n = 0; n < nvertices; n++)
     {
@@ -174,7 +170,7 @@ bfs(sllist **adjls, size_t nvertices, int src_key)
     while (!EMPTYQ(q))
     {
         sllist *u;
-        node  *v;
+        node   *v;
 
         u = dequeue(q);
         for (v = u->head; v != NULL; v = v->next)
@@ -196,12 +192,10 @@ int
 main(void)
 {
     int i, max_erdos_n;
-
     int nvertices, nedges, erdos;
 
     sllist **erdos_adjls; /* Adjacency-lists. */
     int *erdos_ncount;
-
 
     if ( scanf("%d %d\n%d", &nvertices, &nedges, &erdos) != 3 )
     {
