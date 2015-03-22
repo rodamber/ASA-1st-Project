@@ -1,0 +1,79 @@
+Instituto Superior Técnico
+[Imagem com o logótipo]
+Relatório do primeiro projecto de ASA
+Rodrigo André Moreira Bernardo
+ist178942
+
+*Resumo
+*O Problema
+**Introdução
+**Objectivo
+*A Solução
+**A Representação
+**O Algoritmo
+*Avaliação da Complexidade
+*Avaliação Experimental
+*Conclusão
+*Referências
+
+*Resumo
+           (Por fazer)
+(Dizer qual foi a linguagem utilizada e porque)
+
+
+*O Problema
+**Introdução
+
+Paul Erdős, reconhecido matemático do século XX, colaborou com mais de 500
+matemáticos na co-autoria de artigos científicos.
+O número de Erdős é definido como a distância colaborativa de uma pessoa a Paul
+Erdős. Paul Erdős tem número 0, um co-autor de artigos com Paul Erdős tem número
+de Erdős 1, um co-autor de artigos com co-autores de Paul Erdős tem número 2 e
+assim por adiante. [1]
+
+**Objectivo
+
+Dado um input que identifique Erdős, um conjunto de colaboradores seus e as
+colaborações entre si, determinar os números de Erdős de cada um dos
+colaboradores. O output deverá indicar o maior valor, M, de número de Erdős
+identificado, assim como informação relativa ao número de pessoas com número de
+Erdős i, com i ∈ [1,M].
+
+
+*A Solução
+
+A solução passa por executar uma Breadth-First Search (BFS) sobre um grafo cujos
+vértices representam Erdős e os colaboradores, e cujos arcos representam as
+colaborações. Com a BFS conseguimos obter a distância colaborativa entre cada
+colaborador e Erdős. Por fim, apenas é necessário efectuar duas passagens pelos
+colaboradores: uma para determinar M e outra para determinar os valores i (ver
+Objectivo).
+
+**A Representação
+
+Tanto Paul Erdős comos os colaboradores são representados por um inteiro.
+
+A representação do grafo é em listas de adjacências. Mais pormenorizadamente,
+este é representado através de um vector de listas ligadas simples, com tamanho
+igual ao número de  vértices. Cada lista tem a informação relativa ao vértice
+correspondente, utilizada no algoritmo BFS (cor, distância e predecessor), assim
+como um apontador para o primeiro elemento da lista. Cada elemento da lista
+contém um inteiro representativo do colaborador e um apontador para o próximo
+elemento.
+
+**O Algoritmo
+
+O algoritmo BFS utilizado é um adaptado da página 595 da terceira edição do
+livro Introduction to Algorithms [2].
+
+
+*Avaliação da Complexidade
+
+*Avaliação Experimental
+
+*Conclusão
+
+*Referências
+
+[1] Enunciado do primeiro projecto de ASA
+[2] Introduction to Algorithms
