@@ -1,58 +1,58 @@
-Instituto Superior Técnico
-[Imagem com o logótipo]
-Relatório do primeiro projecto de ASA
-Rodrigo André Moreira Bernardo
-ist178942
+\documentclass[12pt, a4paper, margin=3cm]{article}
 
-*Resumo
-*O Problema
-**Introdução
-**Objectivo
-*A Solução
-**A Representação
-**O Algoritmo
-*Avaliação da Complexidade
-*Avaliação Experimental
-*Conclusão
-*Referências
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{authblk}
+\usepackage{enumitem}
 
-*Resumo
-           (Por fazer)
-(Dizer qual foi a linguagem utilizada e porque)
+\setlist[description]{labelindent=1cm}
 
+\title{\textbf{Relatório do 1º projecto de ASA}}
+\author{Rodrigo André Moreira Bernardo \\ ist178942}
+\affil{Instituto Superior Técnico}
 
-*O Problema
-**Introdução
+\date{\today}
 
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+<Dizer qual foi a linguagem utilizada e porque>
+\end{abstract}
+
+\section{O Problema}
+
+\subsection{Introdução}
+\paragraph{}
 Paul Erdős, reconhecido matemático do século XX, colaborou com mais de 500
 matemáticos na co-autoria de artigos científicos.
 O número de Erdős é definido como a distância colaborativa de uma pessoa a Paul
 Erdős. Paul Erdős tem número 0, um co-autor de artigos com Paul Erdős tem número
 de Erdős 1, um co-autor de artigos com co-autores de Paul Erdős tem número 2 e
-assim por adiante. [1]
+assim por adiante [1].
 
-**Objectivo
-
+\subsection{Objectivo}
+\paragraph{}
 Dado um input que identifique Erdős, um conjunto de colaboradores seus e as
 colaborações entre si, determinar os números de Erdős de cada um dos
-colaboradores. O output deverá indicar o maior valor, M, de número de Erdős
-identificado, assim como informação relativa ao número de pessoas com número de
-Erdős i, com i ∈ [1,M].
+colaboradores. O output deverá indicar o maior valor, \textit{M}, de número de Erdős
+identificado, assim como informação do número de pessoas com número de
+Erdős \textit{i}, com 1 $\leq$ \textit{i} $\leq$ \textit{M}.
 
+\section{A Solução}
+\paragraph{}
+A solução passa por executar uma procura em largura primeiro (BFS) sobre um
+grafo cujos vértices representam Erdős e os colaboradores, e cujos arcos
+representam as colaborações. Com a BFS conseguimos obter a distância
+colaborativa entre cada colaborador e Erdős. Por fim, apenas é necessário
+efectuar duas passagens pelos colaboradores: uma para determinar \textit{M} e
+outra para determinar os valores \textit{i} (ver \textit{Objectivo}).
 
-*A Solução
-
-A solução passa por executar uma Breadth-First Search (BFS) sobre um grafo cujos
-vértices representam Erdős e os colaboradores, e cujos arcos representam as
-colaborações. Com a BFS conseguimos obter a distância colaborativa entre cada
-colaborador e Erdős. Por fim, apenas é necessário efectuar duas passagens pelos
-colaboradores: uma para determinar M e outra para determinar os valores i (ver
-Objectivo).
-
-**A Representação
-
+\subsection{A Representação}
+\paragraph{}
 Tanto Paul Erdős comos os colaboradores são representados por um inteiro.
-
 A representação do grafo é em listas de adjacências. Mais pormenorizadamente,
 este é representado através de um vector de listas ligadas simples, com tamanho
 igual ao número de  vértices. Cada lista tem a informação relativa ao vértice
@@ -61,19 +61,64 @@ como um apontador para o primeiro elemento da lista. Cada elemento da lista
 contém um inteiro representativo do colaborador e um apontador para o próximo
 elemento.
 
-**O Algoritmo
-
+\subsection{O Algoritmo}
+\paragraph{}
 O algoritmo BFS utilizado é um adaptado da página 595 da terceira edição do
-livro Introduction to Algorithms [2].
+livro \textit{Introduction to Algorithms} [2].
 
 
-*Avaliação da Complexidade
+\section{Análise Teórica}
+\subsection{Avaliação}
+\paragraph{}
+Do programa destacam-se os seguintes blocos:
 
-*Avaliação Experimental
+\begin{description}
+    \item[i.] A inicialização do vector de listas de adjacências, nas linhas
+        211-214;
+    \item[ii.] A inserção dos arcos no vector, nas linhas 217-233;
+    \item[iii.] A BFS, na linha 239;
+    \item[iv.] A determinação de \textit{M} (ver \textit{Objectivo}), nas linhas
+        242-247;
+    \item[v.] A determinação dos valores \textit{i} (ver \textit{Objectivo}), nas linhas
+        254-258;
+    \item[vi.] A impressão do output, nas linhas 261-265;
+    \item[vii.] As operações de alocação e libertação de memória.
+\end{description}
 
-*Conclusão
+Sejam \textit{V} o número de vértices e \textit{E} o número de arcos do grafo.
+A complexidade das operações realizadas nos pontos \textbf{i.}, \textbf{iv.},
+\textbf{v.} é \textit{O(V)} (ciclos \textit{for} no tamanho do número de vértices).
+Em relação ao ponto \textbf{ii.}, deve ser referido que a operação de inserção
+em lista é \textit{O(1)}, pois cada novo elemento é inserido no início da lista.
+Assim, como a operação \textit{scanf} também é constante, concluí-se que o tempo
+de execução deste ponto é \textit{O(E)}, visto que é um ciclo \textit{for} no
+tamanho do número de arcos.
+O tempo de execução do algoritmo BFS é analisado em [2], na página 597, sendo
+este \textit{O(V + E)} (ponto \textbf{iii.}).
+Como \textit{M} $\leq$ \textit{E}, sai que a complexidade relativa ao
+ponto \textbf{vi.} é \textit{O(E)}.
+Por fim, relativamente ao ponto \textbf{vii.}, alocou-se memória para o vector
+de listas de adjacências, para as listas em si, para os seus elementos e para a
+\textit{queue} utilizada no algoritmo BFS. Tem-se que o número de listas é igual
+a \textit{V}, que o número de elementos que têm é \textit{O(E)} e que o tamanho
+da \textit{queue} é \textit{O(V)}.
 
-*Referências
+\subsection{Conclusões}
+Conclui-se que o tempo de execução do programa é \textit{O(V + E)}.
+A memória ocupada é, também, \textit{O(V + E)}.
+
+
+\section{Avaliação Experimental}
+\paragraph{}
+<Avaliação Experimental>
+Os tempos de execução foram obtidos com a ferramenta \textit{time} do
+\textit{UNIX}.
+
+\section{Referências}
+\paragraph{}
+<Referências>
 
 [1] Enunciado do primeiro projecto de ASA
 [2] Introduction to Algorithms
+
+\end{document}
