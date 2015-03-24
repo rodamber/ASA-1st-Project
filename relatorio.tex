@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper, margin=3cm]{article}
+\documentclass[12pt, a4paper]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -17,10 +17,6 @@
 
 \begin{document}
 \maketitle
-
-\begin{abstract}
-<Dizer qual foi a linguagem utilizada e porque>
-\end{abstract}
 
 \section{O Problema}
 
@@ -43,6 +39,7 @@ Erdős \textit{i}, com 1 $\leq$ \textit{i} $\leq$ \textit{M}.
 
 \section{A Solução}
 \paragraph{}
+O programa foi implementado em linguagem C.
 A solução passa por executar uma procura em largura primeiro (BFS) sobre um
 grafo cujos vértices representam Erdős e os colaboradores, e cujos arcos
 representam as colaborações. Com a BFS conseguimos obter a distância
@@ -76,7 +73,7 @@ Do programa destacam-se os seguintes blocos:
     \item[i.] A inicialização do vector de listas de adjacências, nas linhas
         211-214;
     \item[ii.] A inserção dos arcos no vector, nas linhas 217-233;
-    \item[iii.] A BFS, na linha 239;
+    \item[iii.] A BFS, nas linhas 239 e 150-189;
     \item[iv.] A determinação de \textit{M} (ver \textit{Objectivo}), nas linhas
         242-247;
     \item[v.] A determinação dos valores \textit{i} (ver \textit{Objectivo}), nas linhas
@@ -94,7 +91,10 @@ Assim, como a operação \textit{scanf} também é constante, concluí-se que o 
 de execução deste ponto é \textit{O(E)}, visto que é um ciclo \textit{for} no
 tamanho do número de arcos.
 O tempo de execução do algoritmo BFS é analisado em [2], na página 597, sendo
-este \textit{O(V + E)} (ponto \textbf{iii.}).
+este \textit{O(V + E)} (ponto \textbf{iii.}). De facto, o tempo gasto em
+operações relacionadas com a \textit{queue} é \textit{O(V)}, assim como na
+inicialização. Para além disso, cada lista de adjacências é passada apenas uma
+vez, sendo que o tempo para passar cada uma é \textit{O(E)}.
 Como \textit{M} $\leq$ \textit{E}, sai que a complexidade relativa ao
 ponto \textbf{vi.} é \textit{O(E)}.
 Por fim, relativamente ao ponto \textbf{vii.}, alocou-se memória para o vector
@@ -104,23 +104,83 @@ a \textit{V}, que o número de elementos que cada uma tem é \textit{O(E)} e que
 tamanho da \textit{queue} é \textit{O(V)}.
 
 \subsection{Conclusões}
+\paragraph{}
 Conclui-se que o tempo de execução do programa é \textit{O(V + E)}.
 A memória ocupada é, também, \textit{O(V + E)}.
 
 
 \section{Avaliação Experimental}
 \paragraph{}
-<Avaliação Experimental>
+Após correr alguns testes, foram obtidos os seguintes tempos (totais) de execução com a
+ferramenta \textit{Unix time}.
 
-Os tempos de execução foram obtidos com a ferramenta \textit{time} do
-\textit{UNIX}.
+\begin{center}
+\begin{tabular}{| r | r | r |}
+    \hline
+    Vértices & Arcos & Tempo (s)\\
+    \hline
+    500 & 5 000 & 0,005 \\
+    \hline
+    15 000 & 60 000& 0,063 \\
+    \hline
+    30 000 & 60 000 & 0,064 \\
+    \hline
+    30 000 & 90 000 & 0,080 \\
+    \hline
+    30 000 & 120 000 & 0,105 \\
+    \hline
+    45 000 & 60 000 & 0,067 \\
+    \hline
+    45 000 & 90 000 & 0,088 \\
+    \hline
+    45 000 & 120 000 & 0,109 \\
+    \hline
+    45 000 & 150 000 & 0,133 \\
+    \hline
+\end{tabular}
+\end{center}
+
+\paragraph{}
+Também foi obtida a memória utilizada, com recurso à ferramenta
+\textit{valgrind}.
+
+\begin{center}
+\begin{tabular}{| r | r | r |}
+    \hline
+    Vértices & Arcos & Memória (bytes)\\
+    \hline
+    15 000 & 60 000 & 2 637 892 \\
+    \hline
+    30 000 & 60 000 & 3 360 036 \\
+    \hline
+    30 000 & 90 000 & 4 320 036 \\
+    \hline
+    30 000 & 120 000 & 5 280 036 \\
+    \hline
+    45 000 & 60 000 & 4 080 036 \\
+    \hline
+    45 000 & 90 000 & 5 040 036 \\
+    \hline
+    45 000 & 120 000 & 6 000 036 \\
+    \hline
+    45 000 & 150 000 & 6 960 036 \\
+    \hline
+\end{tabular}
+\end{center}
+
+\paragraph{}
+Com recurso às tabelas, é possível identificar que o programa corre linearmente
+no tamanho do input, como seria de esperar. Destaca-se, no entanto, que o
+programa nota uma sobrecarga maior se aumentarmos os arcos do que se aumentarmos
+os vértices na mesma quantidade. Isto verifica-se porque no algoritmo BFS
+existem mais passagem sobre os arcos do que sobre os vértices, no caso do tempo.
+O impacto na memória do aumento dos arcos já seria de esperar, obviamente.
 
 \section{Referências}
 \paragraph{}
-<Referências>
+\indent[1] Enunciado do primeiro projecto de ASA.
 
-[1] Enunciado do primeiro projecto de ASA
-
-[2] Introduction to Algorithms
+[2] Cormen, Thomas H.; Leiserson, Charles E.; Rivest, Ronald. L; Stein, Clifford
+(2009). \textit{Introduction to Algorithms} (3rd ed.). MIT Press.
 
 \end{document}
